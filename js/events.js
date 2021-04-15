@@ -5,34 +5,49 @@ function changeRadio(data){
 }
 
 function selectedMonth() {
-	var enb04= [2,3];
+	var enb04 = [2,3,30];
+	var enb06 = [30];
 	var option = document.getElementById("days");
 	var select = document.getElementById("month");
+	enableOpt(option,null, false);
 
 	switch(select.value){
 		case "04":
 			enableOpt(option,enb04, true);
 		break;
 
+		case "06":
+			enableOpt(option,enb06, true);
+		break;
+
 		default:
-		enableOpt(option,enb04, false);
+		enableOpt(option,null, false);
 	}
+
 	monthSelected = select.value;
 }
 
 function enableOpt(option, disable, status) {
-	for (var i = 0; i<disable.length; i++) {
-		option.options[disable[i]].disabled  = status;
+	if (disable!=null) {
+		for (var i = 0; i<disable.length; i++) {
+			option.options[disable[i]].disabled  = status;
+		}
+	}else{
+		for (var i = 0; i<31; i++) {
+			option.options[i].disabled  = false;
+		}
 	}
 }
 
-function selectedDay() {
-	day = document.getElementById("days").value;
+function selectedDay(element) {
+	day = document.getElementById(element.id).value;
 	var file;
 
 	if (monthSelected!=null) {
-		file = "data/"+monthSelected+"/"+day+".geojson"
-		loadJsonFile(file);
+		//index.php?day=01&month=05
+		file = "day="+day+"&month="+monthSelected;
+		var get = url+file;
+		loadJsonFile(get);console.log(get);
 
 	}else{
 		alert("A variavel mont está nula. Diretório incorreto!");
@@ -41,7 +56,7 @@ function selectedDay() {
 }
 
 function getMonth(){
-    	var options = "<select id='month' onchange='selectedMonth();' class='select'>";
+    	var options = "<select class='select' id='month' onchange='selectedMonth();'>";
 	    
 		for(var i = 0; i < month.length;i++){
 	    	options+="<option value='"+month[i]+"'>" + month[i];
@@ -51,7 +66,7 @@ function getMonth(){
 	}
 
 function getDay(){
-    var options = "<select id='days' onchange='selectedDay();' class='select'>";
+    var options = '<select id="days" onchange="selectedDay(this);" class="select">';
 	    
 	for(var i = 0; i < days.length;i++){
 	    options+="<option value='"+days[i]+"'>" + days[i];
@@ -59,10 +74,8 @@ function getDay(){
         
     return options+="</select>";
 }
-
 // Include script file
 function addScript(filename){
-
 	 var head = document.getElementsByTagName('body')[0];
 	 var script = document.createElement('script');
 	 script.id = "dataJ";
@@ -75,4 +88,22 @@ function addScript(filename){
 	}catch(err){
 		alert("Erro ao procurar dados!");
 	}
+}
+
+function closeList(input) {
+	var c = 0;
+	if (input.id=="queryText") c = 1;
+
+	var list = document.getElementById('card').style.display;
+
+	if (list=='block'&& c==0) {
+		document.getElementById('btnClose').style.backgroundImage="url('img/icons/up-arrow.svg')";
+		document.getElementById('card').style.display = 'none';
+
+	}else{
+		document.getElementById('btnClose').style.backgroundImage="url('img/icons/arrow-down.svg')";
+		document.getElementById('card').style.display = 'block';
+	}
+
+	console.log(list);
 }

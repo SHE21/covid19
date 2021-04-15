@@ -5,6 +5,7 @@ function handler() {
     processData(this.responseText);
 
   } else {
-    console.log("deu merda");
+  	var loader = document.getElementById('loader');
+  	loader.innerHTML = getAlert();
   }
 }

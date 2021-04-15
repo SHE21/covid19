@@ -1,112 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+
 	<title>COVID-19</title>
 	<script src="js/jquery-2.1.3.js"></script>
-	<script src="js/worker-create.js"></script>
 	<link rel="stylesheet" href="css/style.css"/>
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
 <div id="container">
-	<div id="loader"></div>
-	<div id="map"></div>
+<div id="alerts" style="display:none;position:fixed;z-index: 10000;left:29%;top:1%;"></div>
+<div id="loader"><div id="txtLoading">Te acalma ...</div></div>
+<div id="map"></div>
+<div class="modal fade" id="ModalLongoExemplo" tabindex="-1" role="dialog" aria-labelledby="TituloModalLongoExemplo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalLongoExemplo">Título do modal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="content-more-info" style="min-height: 100px;"></div>
+    </div>
+  </div>
 </div>
+</div>
+<script type="text/javascript">
+	var url = 'http://localhost/serviceCovid19/index.php?';
+	//var url = 'https://www.aygus.com/apps/serviceCovid19/index.php?';
+	var monthSelected = null;
+	var daySelected = null;
+</script>
 <script type="text/javascript" src="js/events.js"></script>
-<script type="text/javascript">addScript("data/data_1606.js");</script>
-<script type="text/javascript" src="geometry/geometry_ma.js"></script>
+<script type="text/javascript" src="js/getHtmlElements.js"></script>
+<script type="text/javascript" src="js/Request.js"></script>
 
-	<script type="text/javascript">
+<script type="text/javascript">
+
+	var month = ["04", "05", "06", "07"];
+	var days = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22","23", "24", "25", "26", "27", "28", "29", "30", "31"];
 
 	var l = false;
-
 	var map = L.map('map').setView([-5.889261, -44.560547], 6);
-
 	var layer = null;
-
 	var geojson = null;
-
 	var superFeature = null;
-
 	var selected = "confirmed";
+	var superData = null;
+	var eOption;
 
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'+'. <a data-toggle="modal" data-whatever="developed" data-target="#ModalLongoExemplo" href="#">Developed By</a>',
 		id: 'mapbox/light-v9',
 		tileSize: 512,
 		zoomOffset: -1
 	}).addTo(map);
-
-	//lista de dados 
-	var files = ['16/06/2020','17/06/2020'];
-
-	function getFiles(){
-    	var options = "<select id='boletim' class='form-control'>";
-	    
-		for(var i = 0; i < files.length;i++){
-	    	options+="<option value='"+files[i]+"'>" + files[i];
-		}
-        
-        return options+="</select>";
-	}
-
-	//INCIO DA FUNCÇÃO
-
-	var geoData = JSON.stringify(geometry);
-	var myGeo = JSON.parse(geoData);
-
-	function loadJson(myGeo){
-
-		var geo = "";
-
-		console.log("INICIO DO LOOP");
-	    for (var i = 0; i<myGeo.features.length;i++){
-	    	var data1 = {
-		    	"data":{
-				   "casos": null,
-				   "obitos": null,
-				   "geocodigo":null
-				}
-			};
-
-			//console.log(data.Dados[i]);
-			var dat = data.Dados[i];
-			if (dat.geocodigo==myGeo.features[i].properties.CD_GEOCMU) {
-		    	data1.data.casos = dat.casos;
-		    	data1.data.obitos = dat.obitos;
-		    	data1.data.geocodigo = dat.geocodigo;
-		    }
-
-	    	var s = myGeo.features[i];
-	    	s.data = data1.data;
-
-	    	var d = myGeo.features[i].properties.CD_GEOCMU;
-	    	geo+=JSON.stringify(s)+",";
-	    }
-
-		console.log("FIM DO LOOP");
-
-	    return toJson(geo);
-	}
-
-    //FIM DA FUNÇÃO MEU BEM
-
-    function toJson(string){
-    	var str = '{"type":"FeatureCollection","features":[';
-    		str+=string;
-    	return str.substr(0, str.length-1);
-    }
-
-    function callJson(myGeo) {
-    	var geoString = loadJson(myGeo);
-    	return JSON.parse(geoString+="]}");
-    }
 
 	// get color depending on population density value
 	function getColor(d) {
@@ -117,26 +78,25 @@
 				d > 50   ? '#FD8D3C' :
 				d > 20   ? '#FEB24C' :
 				d > 10   ? '#FED976' :
-							'#FFEDA0';
+				d > 5    ? '#fff7d4' :
+				d >= 1   ? '#fff0c8' : '#ffffff';
 	}
 
 	function style(feature) {
-		var data1 = null;
-		superFeature = feature;
+		var dataColor = null;
 
 		if (selected=="confirmed") {
-			data1 = superFeature.data.casos;
+			dataColor = feature.properties.confirmados;
 		}else{
-			data1 = superFeature.data.obitos;
+			dataColor = feature.properties.obitos;
 		}
 
 		var style = {
-			weight: 2,
+			weight: 1,
 			opacity: 1,
-			color: 'white',
-			dashArray: '3',
-			fillOpacity: 0.7,
-			fillColor: getColor(data1)
+			color: '#6d6d6d',
+			fillOpacity: 0.8,
+			fillColor: getColor(dataColor)
 		};
 
 		return style;
@@ -152,7 +112,7 @@
 	        fillOpacity: 0.7,
 	    });
 
-	    info.update(layer.feature.properties, layer.feature.data, data);
+	    info.update(layer.feature.properties);
 
 	    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 	        layer.bringToFront();
@@ -190,77 +150,139 @@
 var info = L.control({position: 'bottomright'});
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info');
-
-    var htmlf = '<div class="box-left"><h4>COVID 19</h4>' + getFiles();
-
-	htmlf+= '<br><input checked onchange="changeRadio(this);"type="radio" name="data_type" value="confirmed"> Casos* <input onchange="changeRadio(this);" type="radio" name="data_type" value="obitos"> Óbitos';
-
-	htmlf += '<div id="name_mun" class="name_mun"></div></div>';
-
-	htmlf+='<div class="box-right legend">';
-
-	var grades = [0, 10, 20, 50, 100, 200, 500, 1000];
-
-	 for (var i = 0; i < grades.length; i++) {
-	        htmlf +=
-	            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-	            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-	}
-
-	htmlf+='</div>';
-
-    this._div.innerHTML = htmlf;
+    this._div.innerHTML = getBoxInfo();
     return this._div;
 };
 
 // method that we will use to update the control based on feature properties passed
-info.update = function (props, data, update1) {
-	document.getElementById("name_mun").innerHTML =  (props ? props.NM_MUNICIP : "Município");
+info.update = function (props) {
+	document.getElementById("name_mun").innerHTML =  (props ? props.municipio : "Município");
 };
 
 info.addTo(map);
 
-function getHtmlPopup(layer){
-	var layer = layer.feature;
+var table =  L.control({position:'topright'});
+table.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info');
+    this._div.innerHTML = getTable();
+    return this._div;
+};
 
-	var htmlPop = "<h4>" +layer.properties.NM_MUNICIP+ "</h4>";
-	htmlPop+="<div class='box-data'>"
-	htmlPop +='<div class="numbs confirmed">Casos*<h3>'+layer.data.casos+'</h3></div>'+
-	'<div class="numbs obts">Óbitos<h3>'+layer.data.obitos+'</h3></div></div>';
-	htmlPop+="</div>";
+table.addTo(map);
 
-	return htmlPop;
+var client = new XMLHttpRequest();
+
+function loadJsonFile(file) {
+	jQuery("#loader").show();
+	client.onload = handler;
+	client.open("GET", file);
+	client.send();
 }
 
-function getLayerJson() {
-	if (geojson!=null) {
-		geojson.remove();
+function processData(data) {
+	try {
+		getLayerJson(JSON.parse(data));
+
+	} catch (e) {
+  		jQuery("#loader").fadeOut("slow");
+  		var alert = document.getElementById('alerts');
+  		alert.style.display = 'block';
+  		alert.innerHTML = getAlert();
+
+  		$('.alert').on('closed.bs.alert', function () {
+  			alert.style.display = 'none';
+		});
 	}
-	geojson = L.geoJson(callJson(myGeo), {
+}
+
+function getLayerJson(data) {
+	if (geojson!=null) geojson.remove();
+
+	setContentTable(data);
+	var date = data.data;
+
+	geojson = L.geoJSON(data, {
 		style: style,
 		onEachFeature: onEachFeature,
-
-	}).bindPopup(function (layer) {
-    	return getHtmlPopup(layer);
-
-	}).addTo(map);
-}
-
-getLayerJson();
-
-	loading();
-
-	$("#boletim").change(function() {
-  		$("#loader").show();console.log("show()");
-
-  		selectedFile();
-
-  		$("#loader").delay(1000).fadeOut("slow");console.log("delay(1000)");
 	});
 
-	function loading() {
-		jQuery("#loader").delay(1000).fadeOut("slow");
-	}
+	geojson.bindPopup(function (layer) {
+	    return getHtmlPopup(layer, date);
+	});
+	geojson.bringToBack();
+	geojson.addTo(map);
+	jQuery("#loader").fadeOut("slow");
+	//console.log(data);
+}
+
+$(function(){
+    $("#queryText").keyup(function(){
+        var texto = $(this).val();
+         
+        $("#listMuni li").css("display", "block");
+        $("#listMuni li").each(function(){
+            if($(this).text().toUpperCase().indexOf(texto.toUpperCase()) < 0)
+   			$(this).css("display", "none");
+        });
+    });
+});
+
+function processDataWiki(data) {
+	console.log(data);
+
+}
+
+loadJsonFile(url+'day=20&month=05');
+selectedMonth();
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+
+	$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+});
+
+	$('#ModalLongoExemplo').on('show.bs.modal', function (event) {
+		var cont = document.getElementById("content-more-info");
+		cont.innerHTML="Processando dados da Wikipédia ...";
+
+		var button = $(event.relatedTarget); // Botão que acionou o modal
+		var recipient = button.data('whatever');
+		var modal = $(this);
+
+		if (recipient!=='developed') {
+			modal.find('.modal-title').text(recipient);
+
+			$.ajax({
+		    url: "wiki.php",
+		    type: "POST",
+		    data: "search="+recipient,
+		    dataType: "html"
+
+			}).done(function(resposta) {
+
+				if (resposta!=null) {
+					cont.innerHTML=resposta;
+
+				}else{
+					cont.innerHTML="Sem dados da wikiPedia";
+
+				}
+
+			}).fail(function(jqXHR, textStatus) {
+			    console.log("Request failed: " + textStatus);
+
+			}).always(function() {
+			    console.log("completou");
+			});
+
+		}else{
+			modal.find('.modal-title').text('Sobre');
+			cont.innerHTML= getDeveloped();
+		}
+	});
 </script>
 </body>
 </html>

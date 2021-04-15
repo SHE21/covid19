@@ -6,8 +6,7 @@ html, body {
 		.select{
 			width: 50%;
 			padding: 5px;
-			margin-bottom:8px;
-			float: left;
+			margin-bottom:10px;
 		}
 		#bar{
 			height: 10%;
@@ -21,7 +20,6 @@ html, body {
 			width: 200px;
 		    padding: 6px 8px;
 		    font: 14px/16px Arial, Helvetica, sans-serif;
-		    background: white;
 		    background: rgba(255,255,255,0.8);
 		    box-shadow: 0 0 15px rgba(0,0,0,0.2);
 		    border-radius: 5px;
@@ -39,10 +37,10 @@ html, body {
 		.info {
 		    padding: 10px;
 		    font: 14px/16px Arial, Helvetica, sans-serif;
-		    background: white;
 		    background: rgba(255,255,255,0.8);
 		    box-shadow: 0 0 15px rgba(0,0,0,0.2);
 		    border-radius: 5px;
+		    max-height: 300px;
 		}
 		.info1 {
 		    padding: 6px 8px;
@@ -60,20 +58,24 @@ html, body {
 		.legend {
 		    line-height: 18px;
 		    color: #555;
+		    *background-color: red;
 		}
 		.legend i {
-		    width: 18px;
-		    height: 18px;
+		    width: 17px;
+		    height: 17px;
 		    float: left;
 		    margin-right:10px;
 		    opacity: 0.7;
 		}
 		.box-data{
-			width: 200px;
+			width: 100%;
+			min-width: 200px;
 			*padding:2px;
-			height: 80px;
+			height: 75px;
 			margin-bottom: 20px;
-			*background-color: green;
+			border-top:1px solid #dedede;
+			border-bottom:1px solid #dedede;
+			text-align: center;
 		}
 		.numbs{
 			width: 50%;
@@ -90,10 +92,13 @@ html, body {
 			background-color: green;
 		}
 		.confirmed{
-			background-color: #FF8C00;
+
 		}
 		.obts{
-			background-color: red;
+
+		}
+		#copyData{
+			font-size: 8pt;
 		}
 		.name_mun{
 			margin-top: 10px;
@@ -117,11 +122,79 @@ div#loader{
 	width: 100%;
 	height: 100%;
 	top: 0px;
-	left:0px;
+	left: 0px;
 	background-color:rgba(255, 255, 255, 0.5);
-	background-image: url('../img/load.gif');
-	background-size: 50px 50px;
-	background-position: center center;
-	background-repeat: no-repeat;
 	z-index: 10000;
+	text-align: center;
 }
+
+div#txtLoading{
+	position:relative;
+	padding: 5px;
+	top:47%;
+	left:45.5%;
+	background-color:#ffffff;
+	background-image: url('../img/load.gif');
+	background-size: 30px 30px;
+	background-position: 1px 2px;
+	background-repeat: no-repeat;
+	width: 125px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	-webkit-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.75);
+	box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.75);
+	text-align: right;
+}
+
+div#closeBtn{
+	width: 40px;
+	height: 40px;
+	*background-color: red;
+	padding: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+#card{
+	overflow-y: auto;
+	max-height: 200px;
+	width: 283px;
+	background-color: red;
+}
+#card .tableContent{
+	width: 100%;
+	height: 100%;
+	background-color: green;
+}
+.fechar{
+	float: right;
+	width: 30px;
+	height: 30px;
+	*background-color: green;
+	background-image: url('../img/icons/up-arrow.svg');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 10px;
+	-webkit-border-radius:  100%;
+	-moz-border-radius:  100%;
+	border-radius: 100%;
+	cursor: pointer;
+	border: 1px solid #dedede;
+	color: transparent;
+}
+#tableTop{
+	*background-color: orange;
+	width: 283px;
+	height: 30px;
+}
+#tableTitle{
+	background-color: yellow;
+	float: left;
+	width: 88%;
+	height: 30px;
+}
+
+div#listMuni{}
